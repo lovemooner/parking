@@ -96,9 +96,9 @@ public class ParkingService {
      */
     private long getSleepTime() {
         long time = System.currentTimeMillis();
-        if (time > DateUtil.getTimeMillisByHourOfDay(16) && time < DateUtil.getTimeMillisByHourOfDay(20)) { //16:00:00~20:00:00
+        if (time > DateUtil.getTimeMillisByHourOfDay(15) && time < DateUtil.getTimeMillisByHourOfDay(20)) { //15:00:00~20:00:00
             return Constants.AFTER_WORK_SLEEP_TIME;
-        } else if (time >= DateUtil.getTimeMillisByHourOfDay(6) && time <= DateUtil.getTimeMillisByHourOfDay(16)) {
+        } else if (time >= DateUtil.getTimeMillisByHourOfDay(6) && time <= DateUtil.getTimeMillisByHourOfDay(13)) {
             return Constants.ON_WORK_SLEEP_TIME;
         } else {
             return Constants.SLEEP_TIME_DEFAULT;
