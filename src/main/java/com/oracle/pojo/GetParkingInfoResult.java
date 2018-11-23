@@ -38,6 +38,7 @@ public class GetParkingInfoResult {
         parkingInfo.setLotName(order.getLotName());
         parkingInfo.setComeTime(order.getComeTime());
         parkingInfo.setOutTime(order.getOutTime());
+        parkingInfo.setCarImg(order.getCarImg());
         return parkingInfo;
     }
 

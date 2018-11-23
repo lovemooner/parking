@@ -2,64 +2,57 @@ package com.oracle.service;
 
 import com.oracle.model.Car;
 import com.oracle.model.ParkingInfo;
-import com.oracle.pojo.CacheAdapter;
-import com.oracle.pojo.Constants;
+import com.oracle.util.CacheAdapter;
 import love.moon.common.HttpResponse;
 import love.moon.util.DateUtil;
 import love.moon.util.NumberUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
-public class Worker implements IWorker {
+public class Worker implements Runnable {
     public static final Logger LOG = LoggerFactory.getLogger(Worker.class);
 
     private ParkingService service = new ParkingService();
+    private Car car;
 
+
+    public Worker(Car car) {
+        this.car = car;
+    }
 
     @Override
-    public void doWork() {
-        List<Car> carList = CacheAdapter.getCarList();
-        while (true) {
-            for (Car car : carList) {
-                ParkingInfo parkingInfo = service.requestParkingInfo(car.getCarNo());
-                if(parkingInfo==null){
-                    LOG.error("error info car_id:{}",car.getId());
-                    continue;
-                }
-                parkingInfo.setCarId(car.getId());
-                parkingInfo.setId(CacheAdapter.getParkingMap().get(car.getId()));
-                if (notComming(parkingInfo)) {
-                    LOG.info("Car:" + parkingInfo.getCarId() + " is not comming.");
-                    continue;
-                }
-                if (isSynchronized(parkingInfo)) {
-                    LOG.info("Car:" + parkingInfo.getCarId() + " is  synchronized.");
-                    continue;
-                }
-                if (isNewComming(parkingInfo)) {
-                    HttpResponse response = service.postParkingInfo(parkingInfo);
-                    if (response.getCode() == 200) {
-                        CacheAdapter.getParkingMap().put(parkingInfo.getCarId(), NumberUtil.longValue(response.getContent()));
-                    }
-                } else if (isOut(parkingInfo)) {
-                    parkingInfo.setOutTime(DateUtil.getChinaTime());
-                    HttpResponse response = service.postParkingInfo(parkingInfo);
-                    if (response.getCode() == 200) {
-                        CacheAdapter.getParkingMap().remove(car.getId());
-                    }
-                }
-
+    public void run() {
+            ParkingInfo parkingInfo = service.requestParkingInfo(car.getCarNo());
+            if (parkingInfo == null) {
+                LOG.error("error info car_id:{}", car.getId());
+                return;
             }
-            try {
-                LOG.info("Worker will sleep {} ms",Constants.FETCH_SLEEP_TIME);
-                Thread.sleep(Constants.FETCH_SLEEP_TIME);
-            } catch (InterruptedException e) {
-                LOG.error(e.getMessage(), e);
+            parkingInfo.setCarId(car.getId());
+            parkingInfo.setId(CacheAdapter.getParkingMap().get(car.getId()));
+            if (notComming(parkingInfo)) {
+                LOG.debug("Car:" + parkingInfo.getCarId() + ",employee is  not comming or does not driving car.");
+                return;
             }
-        }
+            if (isSynchronized(parkingInfo)) {
+                LOG.debug("Car:" + parkingInfo.getCarId() + " is  synchronized.");
+                return;
+            }
+            if (isNewComming(parkingInfo)) {
+                HttpResponse response = service.postParkingInfo(parkingInfo);
+                if (response.getCode() == 200) {
+                    CacheAdapter.getParkingMap().put(parkingInfo.getCarId(), NumberUtil.longValue(response.getContent()));
+                    LOG.info("Car is Coming,carId:{}", car.getId());
+                }
+            } else if (isOut(parkingInfo)) {
+                parkingInfo.setOutTime(DateUtil.getChinaTime());
+                HttpResponse response = service.putParkingInfo(parkingInfo);
+                if (response.getCode() == 200) {
+                    CacheAdapter.getParkingMap().remove(car.getId());
+                    LOG.info("Car is Out,carId:{}", car.getId());
+                }
+            }
     }
+
 
     private boolean isSynchronized(ParkingInfo parkingInfo) {
         return CacheAdapter.getParkingMap().get(parkingInfo.getCarId()) != null

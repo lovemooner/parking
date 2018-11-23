@@ -1,6 +1,6 @@
-package com.oracle.service;
+package com.oracle.util;
 
-import love.moon.common.HttpResponse;
+import com.oracle.pojo.Constants;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
@@ -9,6 +9,7 @@ import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import love.moon.common.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +18,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 public class HttpUtil {
     public static final Logger LOG = LoggerFactory.getLogger(HttpUtil.class);
+
+//    public static HttpResponse sendGet(String url) throws IOException {
+//        return sendHttp(url,null,"GET");
+//    }
 
     public static HttpResponse sendGet(String url) throws IOException {
         CloseableHttpClient httpclient = createHttpClient(true);
@@ -41,7 +45,7 @@ public class HttpUtil {
     }
 
 
-    public static HttpResponse sendPost3(String url, Map<String, String> map) throws IOException {
+    public static HttpResponse sendHttp(String url, Map<String, String> map,String method) throws IOException {
         HttpResponse response = new HttpResponse();
         HttpURLConnection httpConn = null;
         try {
@@ -50,15 +54,17 @@ public class HttpUtil {
             httpConn.setDoOutput(true);
             httpConn.setDoInput(true);
             httpConn.setUseCaches(false);
-            httpConn.setRequestMethod("POST");
+            httpConn.setRequestMethod(method);
             httpConn.setRequestProperty("Accept-Charset", "UTF-8");
             httpConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             httpConn.setRequestProperty("User-Agent", "Mozilla/5.0");
-            for (String key : map.keySet()) {
-                if (map.get(key) == null || map.get(key).equals("")) {
-                    continue;
+            if(map!=null&&map.keySet().size()>0){
+                for (String key : map.keySet()) {
+                    if (map.get(key) == null || map.get(key).equals("")) {
+                        continue;
+                    }
+                    httpConn.setRequestProperty(key, map.get(key));
                 }
-                httpConn.setRequestProperty(key, map.get(key));
             }
 //            httpConn.connect()
             InputStream in = httpConn.getInputStream();
@@ -71,7 +77,6 @@ public class HttpUtil {
             }
             bufferedReader.close();
             response.setContent(temp.toString());
-            LOG.info("Post end,responseCode:{}", httpConn.getResponseCode());
             response.setCode(httpConn.getResponseCode());
         } finally {
             if (httpConn != null) {
@@ -82,69 +87,6 @@ public class HttpUtil {
     }
 
 
-    public static int sendPost2(RequestBuilder builder) {
-        CloseableHttpClient client = null;
-        try {
-
-            client = HttpClients.custom().build();
-
-            HttpUriRequest request = builder.build();
-            org.apache.http.HttpResponse response = client.execute(request);
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                System.out.println("Response content: " + EntityUtils.toString(entity, "UTF-8"));
-            }
-            return response.getStatusLine().getStatusCode();
-
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e1) {
-            e1.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            // 关闭连接,释放资源
-            try {
-                client.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return 0;
-    }
-
-    public static int sendPost(String url, List<NameValuePair> formParams) {
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost(url);
-        try {
-            UrlEncodedFormEntity uefEntity = new UrlEncodedFormEntity(formParams, "UTF-8");
-            httppost.setEntity(uefEntity);
-            CloseableHttpResponse response = httpclient.execute(httppost);
-            try {
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    System.out.println("Response content: " + EntityUtils.toString(entity, "UTF-8"));
-                }
-                return response.getStatusLine().getStatusCode();
-            } finally {
-                response.close();
-            }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e1) {
-            e1.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            // 关闭连接,释放资源
-            try {
-                httpclient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return 0;
-    }
 
 
     private static HttpGet mockBrowserGet(String url) {
@@ -166,7 +108,7 @@ public class HttpUtil {
     private static CloseableHttpClient createHttpClient(boolean isProxy) {
         CloseableHttpClient httpclient;
         if (isProxy) {
-            HttpHost proxy = new HttpHost("cn-proxy.jp.oracle.com", 80, "http");
+            HttpHost proxy = new HttpHost(Constants.PROXY_HOST_NAME, Constants.PROXY_HOST_PORT, "http");
             RequestConfig requestConfig = RequestConfig.custom().setProxy(proxy).build();
             //实例化CloseableHttpClient对象
             httpclient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();

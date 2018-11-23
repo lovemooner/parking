@@ -10,9 +10,21 @@
 
     <properties>
         <build.output.directory>C:\Users\nadong\Desktop</build.output.directory>
+        <log4j.version>1.2.16</log4j.version>
+        <slf4j.version>1.5.11</slf4j.version>
     </properties>
 
     <dependencies>
+        <!--<dependency>-->
+            <!--<groupId>log4j</groupId>-->
+            <!--<artifactId>log4j</artifactId>-->
+            <!--<version>${log4j.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>slf4j-log4j12</artifactId>-->
+            <!--<version>${slf4j.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>love.moon</groupId>
             <artifactId>util</artifactId>

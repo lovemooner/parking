@@ -1,15 +1,15 @@
-package com.oracle.pojo;
+package com.oracle.util;
 
 import com.oracle.model.Car;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CacheAdapter {
 
-    private static Map<Long, Long> parkingMap = new HashMap<Long, Long>(); //carId-->parkingInfo
+    private static Map<Long, Long> parkingMap = new ConcurrentHashMap<Long, Long>(); //carId-->parkingInfo
     private static List<Car> carList = new ArrayList<>();
 
     public static Map<Long, Long> getParkingMap() {
@@ -20,11 +20,11 @@ public class CacheAdapter {
         CacheAdapter.parkingMap = parkingMap;
     }
 
-    public static List<Car> getCarList() {
+    public static List<Car> get() {
         return carList;
     }
 
-    public static void setCarList(List<Car> carList) {
+    public static void set(List<Car> carList) {
         CacheAdapter.carList = carList;
     }
 }
