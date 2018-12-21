@@ -1,4 +1,4 @@
-package com.oracle.model;
+package com.oracle.pojo;
 
 public class Car {
     private Long id;

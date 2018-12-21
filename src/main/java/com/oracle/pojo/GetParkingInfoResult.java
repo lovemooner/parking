@@ -1,7 +1,5 @@
 package com.oracle.pojo;
 
-import com.oracle.model.ParkingInfo;
-
 public class GetParkingInfoResult {
 
     private String type;
@@ -39,6 +37,7 @@ public class GetParkingInfoResult {
         parkingInfo.setComeTime(order.getComeTime());
         parkingInfo.setOutTime(order.getOutTime());
         parkingInfo.setCarImg(order.getCarImg());
+        parkingInfo.setSuccess(true);
         return parkingInfo;
     }
 

@@ -1,7 +1,5 @@
 package com.oracle.pojo;
 
-import com.oracle.model.Car;
-
 import java.util.List;
 
 public class GetCarResult {

@@ -9,7 +9,6 @@ public class App {
     private ParkingService service = new ParkingService();
 
 
-
     public void startup() {
         LOG.info("Fetch Parking Info Startup");
         service.initCarCache();
@@ -20,8 +19,5 @@ public class App {
     public static void main(String[] args) {
         App app = new App();
         app.startup();
-
-
     }
-
 }

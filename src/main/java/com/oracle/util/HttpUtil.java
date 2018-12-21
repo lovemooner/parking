@@ -26,7 +26,7 @@ public class HttpUtil {
 //        return sendHttp(url,null,"GET");
 //    }
 
-    public static HttpResponse sendGet(String url) throws IOException {
+    public static HttpResponse get(String url) throws IOException {
         CloseableHttpClient httpclient = createHttpClient(true);
         HttpGet httpGet = mockBrowserGet(url);
         CloseableHttpResponse response = httpclient.execute(httpGet);
@@ -44,6 +44,13 @@ public class HttpUtil {
         return resp;
     }
 
+    public static HttpResponse put(String url, Map<String, String> map) throws IOException {
+       return sendHttp(url,map,"PUT");
+    }
+
+    public static HttpResponse post(String url, Map<String, String> map) throws IOException {
+        return sendHttp(url,map,"POST");
+    }
 
     public static HttpResponse sendHttp(String url, Map<String, String> map,String method) throws IOException {
         HttpResponse response = new HttpResponse();

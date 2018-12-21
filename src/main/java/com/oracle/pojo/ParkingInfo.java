@@ -1,12 +1,21 @@
-package com.oracle.model;
+package com.oracle.pojo;
 
-public class ParkingInfo{
+public class ParkingInfo {
     private Long id;
     private String comeTime;
     private String outTime;
     private String lotName;
     private String carImg;
     private Long carId;
+    private boolean isSuccess;
+
+    public ParkingInfo() {
+    }
+
+    public ParkingInfo(boolean isSuccess) {
+        this.isSuccess = isSuccess;
+    }
+
 
     public Long getId() {
         return id;
@@ -56,5 +65,11 @@ public class ParkingInfo{
         this.carId = carId;
     }
 
+    public boolean isSuccess() {
+        return isSuccess;
+    }
 
+    public void setSuccess(boolean success) {
+        isSuccess = success;
+    }
 }
